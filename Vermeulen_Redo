@@ -1,1 +1,13 @@
+#Packages
+library(readxl)
+library(tidyverse)
 
+#import dataset 
+merge_D <- read_excel("G:/Andere Computer/Mein Laptop/Dokumente/Master VWL/Thesis/Data/HFCS_Data/merge_D.xlsx")
+net_wealth <- merge_D %>% select("DN3001", "SA0010", "HW0010") 
+
+# STEP 1
+## Construct vector of wealth equaly spaced on the CDF of the Pareto
+### F(x)=z=1-(wmin/w)^a
+z <- cbind(seq(from=0, to=0.9999, by=0.0001))
+wealth <- wmin/(1-z) # (wealth is F(x)^-1)
