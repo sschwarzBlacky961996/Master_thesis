@@ -4,8 +4,29 @@ library(tidyverse)
 
 #import dataset 
 merge_D <- read_excel("G:/Andere Computer/Mein Laptop/Dokumente/Master VWL/Thesis/Data/HFCS_Data/merge_D.xlsx")
-net_wealth <- merge_D %>% select("DN3001", "SA0010", "HW0010") 
+net_wealth <- merge_D %>% select("DN3001", "HW0010") 
+# only positive values 
+net_wealth <- net_wealth %>% filter(DN3001>=0)
 
+colnames(net_wealth) <- c("Wealth", "Weight")
+
+trend_100 <- read_excel("G:/Andere Computer/Mein Laptop/Dokumente/Master VWL/Thesis/Data/Trend_top_100_Austria.xlsx")
+trend_100 <- trend_100 %>% select("Wealth", "Weight")
+
+full_data <- rbind(net_wealth, trend_100)
+
+full_data <- full_data %>%
+  arrange(desc(Wealth)) %>%
+  mutate(Rank = row_number())
+
+n <- 14794  # Change n to the desired total length of the vector
+Dummy <- numeric(n)
+Dummy[1:100] <- 0
+Dummy[101:14794] <- 1
+
+full_data <- cbind(full_data, Dummy)
+
+full_data <- full_data %>% relocate(Rank, Dummy, Wealth, Weight)
 # STEP 1
 ## Construct vector of wealth equaly spaced on the CDF of the Pareto
 ### F(x)=z=1-(wmin/w)^a
