@@ -15,9 +15,16 @@ trend_100 <- trend_100 %>% select("Wealth", "Weight")
 
 full_data <- rbind(net_wealth, trend_100)
 
+# for full data 
 full_data <- full_data %>%
   arrange(desc(Wealth)) %>%
   mutate(Rank = row_number())
+
+# for hfcs
+net_wealth <- net_wealth %>%
+  arrange(desc(Wealth)) %>%
+  mutate(Rank = row_number())
+
 
 n <- 14794  # Change n to the desired total length of the vector
 Dummy <- numeric(n)
@@ -27,6 +34,36 @@ Dummy[101:14794] <- 1
 full_data <- cbind(full_data, Dummy)
 
 full_data <- full_data %>% relocate(Rank, Dummy, Wealth, Weight)
+
+# average weight of first i observations full data 
+Weights_full <- cumsum(full_data$Weight)
+N_avg_fi_full <- Weights_full/full_data$Rank # max i of Rank = 14794
+
+# average weight of first i observations hfcs data 
+Weights_hfcs <- cumsum(net_wealth$Weight)
+N_avg_fi_hfcs <- Weights_hfcs/net_wealth$Rank # max i of Rank = 14694
+
+# average weight full data 
+N_bar_full <- last(Weights_full)/last(full_data$Rank)
+
+# average weight hfcs data 
+N_bar_hfcs <- last(Weights_hfcs)/last(net_wealth$Rank)
+
+# construct rank vector full data and hfcs data 
+rank_full <- c(1:14794)
+rank_hfcs <- c(1:14694)
+
+# construct variables of regression - full data 
+
+Y <- log(rank_full - 0.5)*(N_avg_fi_full/N_bar_full)
+
+X <- cbind(rep(1, length(Y)), log(full_data$Wealth))
+
+reg_full <- lm(Y~X) # doesnt work yet - maybe because zeros in wealth 
+coeff_full <- summary(reg_full$coefficients[-2]) 
+
+# construct variables of regression - full data 
+
 # STEP 1
 ## Construct vector of wealth equaly spaced on the CDF of the Pareto
 ### F(x)=z=1-(wmin/w)^a
