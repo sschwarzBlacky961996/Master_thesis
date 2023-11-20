@@ -1,0 +1,212 @@
+library(readxl)
+library(tidyverse)
+
+
+#import dataset 
+merge_D <- read_excel("G:/Andere Computer/Mein Laptop/Dokumente/Master VWL/Thesis/Data/HFCS_Data/merge_D.xlsx")
+net_wealth <- merge_D %>% select("DN3001", "HW0010") 
+# only positive values 
+net_wealth <- net_wealth %>% filter(DN3001>0)
+
+colnames(net_wealth) <- c("Wealth", "Weight")
+
+trend_100 <- read_excel("G:/Andere Computer/Mein Laptop/Dokumente/Master VWL/Thesis/Data/Trend_top_100_Austria.xlsx")
+trend_100 <- trend_100 %>% select("Wealth", "Weight")
+
+full_data <- rbind(net_wealth, trend_100)
+
+
+# for full data 
+full_data <- full_data %>%
+  arrange(desc(Wealth)) %>%
+  mutate(Rank = row_number())
+
+# for hfcs
+net_wealth <- net_wealth %>%
+  arrange(desc(Wealth)) %>%
+  mutate(Rank = row_number())
+
+
+# Regressions - steps in 50000 from 0 - 2.500.0000
+
+## wmin = 0 Regression 1
+Nfi_1 <- cumsum(net_wealth$Weight)/net_wealth$Rank
+N_bar_1 <- sum(net_wealth$Weight)/length(net_wealth$Rank)
+Y_1 <- (net_wealth$Rank - 0.5)*(Nfi_1/N_bar_1)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_11 <- rep(6.877579e-05, 14540)
+X_12 <- rep(0, 14540) #wmin =0 daher nd genutzt
+X_13 <- net_wealth$Wealth
+
+reg_1 <- lm(log(Y_1) ~ log(X_11) + log(X_13) -1)
+
+## wmin = 25000 wie in List als check  Regression 2
+net_wealth_2 <- net_wealth %>% filter(net_wealth$Wealth > 25000)
+Nfi_2 <- cumsum(net_wealth_2$Weight)/net_wealth_2$Rank
+N_bar_2 <- sum(net_wealth_2$Weight)/length(net_wealth_2$Rank)
+Y_2 <- (net_wealth_2$Rank - 0.5)*(Nfi_2/N_bar_2)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_21 <- rep(N_bar_2/sum(net_wealth_2$Weight), length(net_wealth_2))
+X_22 <- rep(25000, length(net_wealth_2)) #wmin = 25000 
+Cons_2 <- X_21 + X_22
+X_23 <- net_wealth_2$Wealth
+
+reg_2 <- lm(log(Y_2) ~ log(Cons_2) + log(X_23) -1)
+
+## wmin = 50000 wie in List als check  Regression 3
+net_wealth_3 <- net_wealth %>% filter(net_wealth$Wealth > 50000)
+Nfi_3 <- cumsum(net_wealth_3$Weight)/net_wealth_3$Rank
+N_bar_3 <- sum(net_wealth_3$Weight)/length(net_wealth_3$Rank)
+Y_3 <- (net_wealth_3$Rank - 0.5)*(Nfi_3/N_bar_3)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_31 <- rep(N_bar_3/sum(net_wealth_3$Weight), length(net_wealth_3))
+X_32 <- rep(50000, length(net_wealth_3)) #wmin = 50000 
+Cons_3 <- X_31 + X_32
+X_33 <- net_wealth_3$Wealth
+
+reg_3 <- lm(log(Y_3) ~ log(Cons_3) + log(X_33) -1)
+
+## wmin = 100000 wie in List als check  Regression 4
+net_wealth_4 <- net_wealth %>% filter(net_wealth$Wealth > 100000)
+Nfi_4 <- cumsum(net_wealth_4$Weight)/net_wealth_4$Rank
+N_bar_4 <- sum(net_wealth_4$Weight)/length(net_wealth_4$Rank)
+Y_4 <- (net_wealth_4$Rank - 0.5)*(Nfi_4/N_bar_4)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_41 <- rep(N_bar_4/sum(net_wealth_4$Weight), length(net_wealth_4))
+X_42 <- rep(100000, length(net_wealth_4)) #wmin = 100000 
+Cons_4 <- X_41 + X_42
+X_43 <- net_wealth_4$Wealth
+
+reg_4 <- lm(log(Y_4) ~ log(Cons_4) + log(X_43) -1)
+
+## wmin = 150000 wie in List als check  Regression 5
+net_wealth_5 <- net_wealth %>% filter(net_wealth$Wealth > 150000)
+Nfi_5 <- cumsum(net_wealth_5$Weight)/net_wealth_5$Rank
+N_bar_5 <- sum(net_wealth_5$Weight)/length(net_wealth_5$Rank)
+Y_5 <- (net_wealth_5$Rank - 0.5)*(Nfi_5/N_bar_5)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_51 <- rep(N_bar_5/sum(net_wealth_5$Weight), length(net_wealth_5))
+X_52 <- rep(150000, length(net_wealth_5)) #wmin = 150000 
+Cons_5 <- X_51 + X_52
+X_53 <- net_wealth_5$Wealth
+
+reg_5 <- lm(log(Y_5) ~ log(Cons_5) + log(X_53) -1)
+
+## wmin = 200000 wie in List als check  Regression 6
+net_wealth_6 <- net_wealth %>% filter(net_wealth$Wealth > 200000)
+Nfi_6 <- cumsum(net_wealth_6$Weight)/net_wealth_6$Rank
+N_bar_6 <- sum(net_wealth_6$Weight)/length(net_wealth_6$Rank)
+Y_6 <- (net_wealth_6$Rank - 0.5)*(Nfi_6/N_bar_6)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_61 <- rep(N_bar_6/sum(net_wealth_6$Weight), length(net_wealth_6))
+X_62 <- rep(200000, length(net_wealth_6)) #wmin = 200000 
+Cons_6 <- X_61 + X_62
+X_63 <- net_wealth_6$Wealth
+
+reg_6 <- lm(log(Y_6) ~ log(Cons_6) + log(X_63) -1)
+
+## wmin = 250000 wie in List als check  Regression 7
+net_wealth_7 <- net_wealth %>% filter(net_wealth$Wealth > 250000)
+Nfi_7 <- cumsum(net_wealth_7$Weight)/net_wealth_7$Rank
+N_bar_7 <- sum(net_wealth_7$Weight)/length(net_wealth_7$Rank)
+Y_7 <- (net_wealth_7$Rank - 0.5)*(Nfi_7/N_bar_7)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_71 <- rep(N_bar_7/sum(net_wealth_7$Weight), length(net_wealth_7))
+X_72 <- rep(250000, length(net_wealth_7)) #wmin = 250000 
+Cons_7 <- X_71 + X_72
+X_73 <- net_wealth_7$Wealth
+
+reg_7 <- lm(log(Y_7) ~ log(Cons_7) + log(X_73) -1)
+
+## wmin = 300000 wie in List als check  Regression 8
+net_wealth_8 <- net_wealth %>% filter(net_wealth$Wealth > 300000)
+Nfi_8 <- cumsum(net_wealth_8$Weight)/net_wealth_8$Rank
+N_bar_8 <- sum(net_wealth_8$Weight)/length(net_wealth_8$Rank)
+Y_8 <- (net_wealth_8$Rank - 0.5)*(Nfi_8/N_bar_8)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_81 <- rep(N_bar_8/sum(net_wealth_8$Weight), length(net_wealth_8))
+X_82 <- rep(300000, length(net_wealth_8)) #wmin = 300000 
+Cons_8 <- X_81 + X_82
+X_83 <- net_wealth_8$Wealth
+
+reg_8 <- lm(log(Y_8) ~ log(Cons_8) + log(X_83) -1)
+
+## wmin = 400000 wie in List als check  Regression 9
+net_wealth_9 <- net_wealth %>% filter(net_wealth$Wealth > 400000)
+Nfi_9 <- cumsum(net_wealth_9$Weight)/net_wealth_9$Rank
+N_bar_9 <- sum(net_wealth_9$Weight)/length(net_wealth_9$Rank)
+Y_9 <- (net_wealth_9$Rank - 0.5)*(Nfi_9/N_bar_9)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_91 <- rep(N_bar_9/sum(net_wealth_9$Weight), length(net_wealth_9))
+X_92 <- rep(400000, length(net_wealth_9)) #wmin = 400000 
+Cons_9 <- X_91 + X_92
+X_93 <- net_wealth_9$Wealth
+
+reg_9 <- lm(log(Y_9) ~ log(Cons_9) + log(X_93) -1)
+
+## wmin = 500000 wie in List als check  Regression 10
+net_wealth_10 <- net_wealth %>% filter(net_wealth$Wealth > 500000)
+Nfi_10 <- cumsum(net_wealth_10$Weight)/net_wealth_10$Rank
+N_bar_10 <- sum(net_wealth_10$Weight)/length(net_wealth_10$Rank)
+Y_10 <- (net_wealth_10$Rank - 0.5)*(Nfi_10/N_bar_10)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_10.1 <- rep(N_bar_10/sum(net_wealth_10$Weight), length(net_wealth_10))
+X_10.2 <- rep(500000, length(net_wealth_10)) #wmin = 500000 
+Cons_10 <- X_10.1 + X_10.2
+X_10.3 <- net_wealth_10$Wealth
+
+reg_10 <- lm(log(Y_10) ~ log(Cons_10) + log(X_10.3) -1)
+
+## wmin = 600000 wie in List als check  Regression 11
+net_wealth_11 <- net_wealth %>% filter(net_wealth$Wealth > 600000)
+Nfi_11 <- cumsum(net_wealth_11$Weight)/net_wealth_11$Rank
+N_bar_11 <- sum(net_wealth_11$Weight)/length(net_wealth_11$Rank)
+Y_11 <- (net_wealth_11$Rank - 0.5)*(Nfi_11/N_bar_11)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_11.1 <- rep(N_bar_11/sum(net_wealth_11$Weight), length(net_wealth_11))
+X_11.2 <- rep(600000, length(net_wealth_11)) #wmin = 600000 
+Cons_11 <- X_11.1 + X_11.2
+X_11.3 <- net_wealth_11$Wealth
+
+reg_11 <- lm(log(Y_11) ~ log(Cons_11) + log(X_11.3) -1)
+
+## wmin = 700000 wie in List als check  Regression 12
+net_wealth_12 <- net_wealth %>% filter(net_wealth$Wealth > 700000)
+Nfi_12 <- cumsum(net_wealth_12$Weight)/net_wealth_12$Rank
+N_bar_12 <- sum(net_wealth_12$Weight)/length(net_wealth_12$Rank)
+Y_12 <- (net_wealth_12$Rank - 0.5)*(Nfi_12/N_bar_12)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_12.1 <- rep(N_bar_12/sum(net_wealth_12$Weight), length(net_wealth_12))
+X_12.2 <- rep(700000, length(net_wealth_12)) #wmin = 700000 
+Cons_12 <- X_12.1 + X_12.2
+X_12.3 <- net_wealth_12$Wealth
+
+reg_12 <- lm(log(Y_12) ~ log(Cons_12) + log(X_12.3) -1)
+
+## wmin = 800000 wie in List als check  Regression 13
+net_wealth_13 <- net_wealth %>% filter(net_wealth$Wealth > 800000)
+Nfi_13 <- cumsum(net_wealth_13$Weight)/net_wealth_13$Rank
+N_bar_13 <- sum(net_wealth_13$Weight)/length(net_wealth_13$Rank)
+Y_13 <- (net_wealth_13$Rank - 0.5)*(Nfi_13/N_bar_13)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_13.1 <- rep(N_bar_13/sum(net_wealth_13$Weight), length(net_wealth_13))
+X_13.2 <- rep(800000, length(net_wealth_13)) #wmin = 800000 
+Cons_13 <- X_13.1 + X_13.2
+X_13.3 <- net_wealth_13$Wealth
+
+reg_13 <- lm(log(Y_13) ~ log(Cons_13) + log(X_13.3) -1)
+
+
+## wmin = 231600 wie in List als check  Regression 2
+net_wealth_2 <- net_wealth %>% filter(net_wealth$Wealth > 231600)
+Nfi_2 <- cumsum(net_wealth_2$Weight)/net_wealth_2$Rank
+N_bar_2 <- sum(net_wealth_2$Weight)/length(net_wealth_2$Rank)
+Y_2 <- (net_wealth_2$Rank - 0.5)*(Nfi_2/N_bar_2)
+#X_11 = N_bar_1/sum(net_wealth$Weight)
+X_21 <- rep(N_bar_2/sum(net_wealth_2$Weight), length(net_wealth_2))
+X_22 <- rep(231600, length(net_wealth_2)) #wmin = 231600 
+Cons_2 <- X_21 + X_22
+X_23 <- net_wealth_2$Wealth
+
+reg_2 <- lm(log(Y_2) ~ log(Cons_2) + log(X_23) -1) # \alpha not the same as in List since not ERLDB used yet
+
