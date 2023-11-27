@@ -557,3 +557,6 @@ values_35 <- cbind(summary(reg_35)$coefficients[2]*(-1), sqrt(mean(reg_35$residu
 alpha_rsme <- rbind(values_1, values_2, values_3, values_4, values_5, values_6, values_7, values_8, values_9, values_10, values_11, values_12, values_13, values_14, values_15)
 alpha_rsme <- rbind(alpha_rsme, values_16, values_17, values_18, values_19, values_20, values_21, values_22, values_23, values_24)
 alpha_rsme <- rbind(alpha_rsme, values_25, values_26, values_27, values_28, values_29, values_30, values_31, values_32, values_33, values_34, values_35)
+
+colnames(alpha_rsme) <- c("Alpha", "RSME")
+
